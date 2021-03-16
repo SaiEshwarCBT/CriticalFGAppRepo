@@ -1,0 +1,140 @@
+<mvc:View controllerName="stocklevel.CriticalStockLevelFG.controller.CriticalStockLevel" xmlns:html="http://www.w3.org/1999/xhtml"
+	xmlns:mvc="sap.ui.core.mvc" displayBlock="true" xmlns="sap.m" xmlns:core="sap.ui.core" xmlns:viz="sap.viz.ui5.controls"
+	xmlns:layout="sap.ui.layout" xmlns:viz.feeds="sap.viz.ui5.controls.common.feeds" xmlns:viz.data="sap.viz.ui5.data"
+	xmlns:unified="sap.ui.unified" xmlns:fb="sap.ui.comp.filterbar" xmlns:f="sap.f" xmlns:chart="sap.suite.ui.commons" height="100%">
+	<App id="idAppControl">
+		<pages>
+			<Page showHeader="false">
+				<content>
+					<f:DynamicPage id="dynamicPageId">
+						<f:title>
+							<f:DynamicPageTitle>
+								<f:heading>
+									<Text text="Filters"></Text>
+								</f:heading>
+								<f:actions>
+									<ToolbarSpacer/>
+									<core:Icon id="refreshIcon" src="sap-icon://refresh" tooltip="Refresh" press="refreshMainTab" class="refreshIcon"></core:Icon>
+								</f:actions>
+							</f:DynamicPageTitle>
+						</f:title>
+						<f:header>
+							<f:DynamicPageHeader pinnable="true">
+								<f:content>
+									<fb:FilterBar reset="onReset" search="onSearch" useToolbar="false" showGoOnFB="false" showRestoreButton="false"
+										showFilterConfiguration="false">
+										<fb:filterGroupItems>
+											<fb:FilterGroupItem groupName="G1" name="A" label="Plant" mandatory="true" visibleInFilterBar="true">
+												<fb:control>
+													<ComboBox id="plant" placeholder="Plant" class="comboBoxHeight" items="{plant>/}" selectionChange="changePlantViz"
+														showSecondaryValues="true" enabled="true">
+														<core:ListItem key="{plant>key}" text="{plant>plantDataCom}" additionalText="{plant>plantDescData}"/>
+													</ComboBox>
+												</fb:control>
+											</fb:FilterGroupItem>
+											<fb:FilterGroupItem groupName="G1" name="B" label="Material" visibleInFilterBar="true">
+												<fb:control>
+													<ComboBox id="material" placeholder="Material" class="comboBoxHeight" items="{material>/}" showSecondaryValues="true"
+														selectionChange="changeMaterialViz">
+														<core:ListItem key="{material>key}" text="{material>materialDataCom}" additionalText="{material>materialDescData}"/>
+													</ComboBox>
+												</fb:control>
+											</fb:FilterGroupItem>
+										</fb:filterGroupItems>
+									</fb:FilterBar>
+								</f:content>
+							</f:DynamicPageHeader>
+						</f:header>
+						<f:content>
+							<layout:FixFlex id='chartFixFlex' minFlexSize="250">
+								<layout:flexContent>
+									<chart:ChartContainer id="chartContainer" showFullScreen="true" showZoom="false" title="Critical Stock Level - FG" showLegendButton="false"
+										autoAdjustHeight="true" contentChange="getTableIcon">
+										<chart:ChartContainerContent icon="sap-icon://bar-chart" title="Bar Chart">
+											<chart:content>
+												<viz:VizFrame id="stockLevelVizframe" vizType='column' width="100%" selectData="getMaterialTable" class="customChart1" uiConfig="{applicationSet:'fiori'}">
+													<viz:layoutData>
+														<layout:GridData span="XL6 L6 M12 S12"/>
+													</viz:layoutData>
+													<viz:dataset>
+														<viz.data:FlattenedDataset data="{stockLevelVizframe>/}">
+															<viz.data:dimensions>
+																<viz.data:DimensionDefinition name="Material" value="{stockLevelVizframe>materialDesc}"/>
+															</viz.data:dimensions>
+															<viz.data:measures>
+																<viz.data:MeasureDefinition name="StockInDays" value="{stockLevelVizframe>daysofstock}"/>
+															</viz.data:measures>
+														</viz.data:FlattenedDataset>
+													</viz:dataset>
+													<viz:feeds>
+														<viz.feeds:FeedItem uid="valueAxis" type="Measure" values="StockInDays"/>
+														<viz.feeds:FeedItem uid="categoryAxis" type="Dimension" values="Material"/>
+													</viz:feeds>
+												</viz:VizFrame>
+											</chart:content>
+										</chart:ChartContainerContent>
+										<chart:ChartContainerContent icon="sap-icon://table-view" title="Table">
+											<chart:content>
+												<Table id="fgTable" items="{ path: 'fgTable>/', sorter: [{path: 'deliveryYear', descending: true}]}" growing="true"
+													growingScrollToLoad="true" growingThreshold="50" width="100%" class="tableMargin sapUiSizeCompact">
+													<columns>
+														<Column hAlign="Left" width="12%">
+															<Text text="Plant" tooltip="Plant"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" width="15%" demandPopin="true" hAlign="Left">
+															<Text text="Material" tooltip="Material"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="Left">
+															<Text text="Mat Group" tooltip="Material Group"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="UnRest Stock" tooltip="UnRestricted Stock"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Qual Insp Stock" tooltip="Quality Insception Stock"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Sale ord Qty" tooltip="Sale Order Quantity"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Total Stock" tooltip="Total Stock"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Unit" tooltip="Unit"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Avg Day Cons" tooltip="Average Day Consumption"></Text>
+														</Column>
+														<Column minScreenWidth="Desktop" demandPopin="true" hAlign="End">
+															<Text text="Days of Stock" tooltip="Days of Stock"></Text>
+														</Column>
+													</columns>
+													<items>
+														<ColumnListItem>
+															<cells>
+																<ObjectIdentifier text="{fgTable>plant}" title="{fgTable>plantDesc}"></ObjectIdentifier>
+																<ObjectIdentifier text="{fgTable>material}" title="{fgTable>materialDesc}"></ObjectIdentifier>
+																<ObjectIdentifier text="{fgTable>matGroup}" title="{fgTable>matGroupDesc}"></ObjectIdentifier>
+																<ObjectIdentifier text="{fgTable>unRestStock}"></ObjectIdentifier>
+																<ObjectIdentifier text="{fgTable>qualityInspStock}"></ObjectIdentifier>
+																<ObjectNumber number="{fgTable>saleOrderQty}"></ObjectNumber>
+																<ObjectNumber number="{fgTable>totalStock}"></ObjectNumber>
+																<ObjectNumber number="{fgTable>unit}"></ObjectNumber>
+																<ObjectNumber number="{fgTable>avgDayConsumption}"></ObjectNumber>
+																<ObjectNumber number="{fgTable>daysofstock}"></ObjectNumber>
+															</cells>
+														</ColumnListItem>
+													</items>
+												</Table>
+											</chart:content>
+										</chart:ChartContainerContent>
+									</chart:ChartContainer>
+								</layout:flexContent>
+							</layout:FixFlex>
+						</f:content>
+					</f:DynamicPage>
+				</content>
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
